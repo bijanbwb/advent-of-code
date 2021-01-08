@@ -10,14 +10,13 @@ type Floor
     = Floor Int
 
 
+type Input
+    = Input String
+
+
 type Instruction
     = Up
     | Down
-    | Invalid
-
-
-type Input
-    = Input String
 
 
 
@@ -27,12 +26,10 @@ type Input
 
 
 run : String -> Int
-run input =
-    input
-        |> processInput
-        |> parseInput
-        |> processInstructions
-        |> floorToInt
+run =
+    processInput
+        >> processInstructions
+        >> floorToInt
 
 
 
@@ -46,25 +43,12 @@ rawInput =
     """
 
 
-processInput : String -> Input
+processInput : String -> List Instruction
 processInput string =
     string
         |> String.trim
-        |> Input
-
-
-parseInput : Input -> List Instruction
-parseInput input =
-    input
-        |> inputToString
         |> String.split ""
-        |> List.filter validInstruction
-        |> List.map stringToInstruction
-
-
-validInstruction : String -> Bool
-validInstruction instruction =
-    instruction == "(" || instruction == ")"
+        |> List.filterMap stringToInstruction
 
 
 
@@ -87,9 +71,6 @@ processInstruction instruction currentFloor =
         Down ->
             currentFloor - 1
 
-        _ ->
-            currentFloor
-
 
 
 -- HELPERS
@@ -100,25 +81,14 @@ floorToInt (Floor int) =
     int
 
 
-inputToString : Input -> String
-inputToString (Input string) =
-    string
-
-
-
-{-
-   TODO: Refector to remove Invalid case using Parser.
--}
-
-
-stringToInstruction : String -> Instruction
+stringToInstruction : String -> Maybe Instruction
 stringToInstruction string =
     case string of
         "(" ->
-            Up
+            Just Up
 
         ")" ->
-            Down
+            Just Down
 
         _ ->
-            Invalid
+            Nothing
