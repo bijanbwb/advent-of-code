@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "format": "elm-format src/ --yes",
-    "start": "elm-live src/Main.elm --open -- --debug",
+    "start": "elm-live src/Main.elm --open --start-page=index.html -- --output=index.js --debug",
     "test": "elm-test",
     "watch": "elm-test --watch"
   },
