@@ -19,25 +19,33 @@ type Direction
     | West
 
 
-type HouseLocation
-    = HouseLocation ( Int, Int )
+type House
+    = House ( X, Y )
+
+
+type alias HousesVisited =
+    List House
+
+
+type alias UniqueHousesVisited =
+    Set ( X, Y )
+
+
+type alias X =
+    Int
+
+
+type alias Y =
+    Int
 
 
 type alias Instruction =
     String
 
 
-type alias Model =
-    { locationsVisited : List HouseLocation
-    , presentsDelivered : Int
-    }
-
-
-initialModel : Model
-initialModel =
-    { locationsVisited = [ HouseLocation ( 0, 0 ) ]
-    , presentsDelivered = 1
-    }
+initialHousesVisited : HousesVisited
+initialHousesVisited =
+    [ House ( 0, 0 ) ]
 
 
 
@@ -48,20 +56,23 @@ run : String -> Int
 run =
     processInput
         >> processInstructions
-        >> processDirections initialModel
-        >> getResult
+        >> processDirections initialHousesVisited
+        >> removeDuplicateLocations
+        >> getUniqueHousesVisited
 
 
-getResult : List HouseLocation -> Int
-getResult visitedLocations =
-    -- TODO: Deduplicate list.
-    List.length visitedLocations
+
+-- PROCESS INPUT
 
 
 processInput : String -> List Instruction
 processInput =
     String.trim
         >> String.split ""
+
+
+
+-- PROCESS INSTRUCTIONS
 
 
 processInstructions : List Instruction -> List Direction
@@ -88,30 +99,50 @@ instructionToDirection string =
             Nothing
 
 
-processDirections : Model -> List Direction -> List HouseLocation
-processDirections { locationsVisited } directions =
-    List.foldl moveToNewLocation locationsVisited directions
+
+-- PROCESS DIRECTIONS
 
 
-moveToNewLocation : Direction -> List HouseLocation -> List HouseLocation
-moveToNewLocation direction locationsVisited =
-    case locationsVisited of
-        (HouseLocation ( x, y )) :: rest ->
+processDirections : HousesVisited -> List Direction -> HousesVisited
+processDirections housesVisited =
+    List.foldl moveToNewLocation housesVisited
+
+
+moveToNewLocation : Direction -> HousesVisited -> HousesVisited
+moveToNewLocation direction housesVisited =
+    case housesVisited of
+        (House ( x, y )) :: rest ->
             case direction of
                 North ->
-                    HouseLocation ( x, y + 1 ) :: locationsVisited
+                    House ( x, y + 1 ) :: housesVisited
 
                 East ->
-                    HouseLocation ( x + 1, y ) :: locationsVisited
+                    House ( x + 1, y ) :: housesVisited
 
                 South ->
-                    HouseLocation ( x, y - 1 ) :: locationsVisited
+                    House ( x, y - 1 ) :: housesVisited
 
                 West ->
-                    HouseLocation ( x - 1, y ) :: locationsVisited
+                    House ( x - 1, y ) :: housesVisited
 
         [] ->
             []
+
+
+removeDuplicateLocations : HousesVisited -> UniqueHousesVisited
+removeDuplicateLocations =
+    List.map location
+        >> Set.fromList
+
+
+location : House -> ( Int, Int )
+location (House location_) =
+    location_
+
+
+getUniqueHousesVisited : UniqueHousesVisited -> Int
+getUniqueHousesVisited =
+    Set.size
 
 
 
