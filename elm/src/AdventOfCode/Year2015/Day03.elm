@@ -43,9 +43,19 @@ type alias Instruction =
     String
 
 
-initialHousesVisited : HousesVisited
-initialHousesVisited =
-    [ House ( 0, 0 ) ]
+initialSantaHousesVisited : HousesVisited
+initialSantaHousesVisited =
+    [ initialHouse ]
+
+
+initialRoboSantaHousesVisited : HousesVisited
+initialRoboSantaHousesVisited =
+    [ initialHouse ]
+
+
+initialHouse : House
+initialHouse =
+    House ( 0, 0 )
 
 
 
@@ -56,7 +66,7 @@ run : String -> Int
 run =
     processInput
         >> processInstructions
-        >> processDirections initialHousesVisited
+        >> processDirections initialSantaHousesVisited initialRoboSantaHousesVisited
         >> removeDuplicateLocations
         >> getUniqueHousesVisited
 
@@ -103,9 +113,34 @@ instructionToDirection string =
 -- PROCESS DIRECTIONS
 
 
-processDirections : HousesVisited -> List Direction -> HousesVisited
-processDirections housesVisited =
-    List.foldl moveToNewLocation housesVisited
+processDirections : HousesVisited -> HousesVisited -> List Direction -> ( HousesVisited, HousesVisited )
+processDirections santaHousesVisited_ roboSantaHousesVisited_ directions =
+    let
+        ( santaDirections, roboSantaDirections ) =
+            directions
+                |> List.indexedMap Tuple.pair
+                |> List.partition isEven
+
+        santaHousesVisited =
+            santaDirections
+                |> List.map Tuple.second
+                |> List.foldl moveToNewLocation santaHousesVisited_
+
+        roboSantaHousesVisited =
+            roboSantaDirections
+                |> List.map Tuple.second
+                |> List.foldl moveToNewLocation roboSantaHousesVisited_
+    in
+    ( santaHousesVisited, roboSantaHousesVisited )
+
+
+isEven : ( Int, a ) -> Bool
+isEven ( int, _ ) =
+    let
+        index =
+            int + 1
+    in
+    modBy 2 index == 0
 
 
 moveToNewLocation : Direction -> HousesVisited -> HousesVisited
@@ -129,10 +164,15 @@ moveToNewLocation direction housesVisited =
             []
 
 
-removeDuplicateLocations : HousesVisited -> UniqueHousesVisited
-removeDuplicateLocations =
-    List.map location
-        >> Set.fromList
+removeDuplicateLocations : ( HousesVisited, HousesVisited ) -> ( UniqueHousesVisited, UniqueHousesVisited )
+removeDuplicateLocations ( santaHousesVisited, roboSantaHousesVisited ) =
+    ( santaHousesVisited
+        |> List.map location
+        |> Set.fromList
+    , roboSantaHousesVisited
+        |> List.map location
+        |> Set.fromList
+    )
 
 
 location : House -> ( Int, Int )
@@ -140,9 +180,11 @@ location (House location_) =
     location_
 
 
-getUniqueHousesVisited : UniqueHousesVisited -> Int
-getUniqueHousesVisited =
-    Set.size
+getUniqueHousesVisited : ( UniqueHousesVisited, UniqueHousesVisited ) -> Int
+getUniqueHousesVisited ( santaHousesVisited, roboSantaHousesVisited ) =
+    santaHousesVisited
+        |> Set.union roboSantaHousesVisited
+        |> Set.size
 
 
 

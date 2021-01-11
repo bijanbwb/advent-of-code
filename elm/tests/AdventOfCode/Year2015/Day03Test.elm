@@ -16,15 +16,28 @@ import Test exposing (Test)
 suite : Test
 suite =
     Test.describe "Day03"
-        [ shouldProduceCorrectSolution rawInput ]
+        [ -- shouldProduceCorrectPartISolution rawInput
+          shouldProduceCorrectPartIISolution rawInput
+        ]
 
 
-shouldProduceCorrectSolution : String -> Test
-shouldProduceCorrectSolution input =
-    Test.test "shouldProduceCorrectSolution" <|
+shouldProduceCorrectPartISolution : String -> Test
+shouldProduceCorrectPartISolution input =
+    Test.test "shouldProduceCorrectPartISolution" <|
         \_ ->
             let
                 result =
                     run input
             in
             Expect.equal result 2081
+
+
+shouldProduceCorrectPartIISolution : String -> Test
+shouldProduceCorrectPartIISolution input =
+    Test.test "shouldProduceCorrectPartIISolution" <|
+        \_ ->
+            let
+                result =
+                    run input
+            in
+            Expect.equal result 2341
