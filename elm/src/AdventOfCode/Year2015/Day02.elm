@@ -6,16 +6,16 @@ module AdventOfCode.Year2015.Day02 exposing
 -- MODEL
 
 
-type alias Length =
-    Int
+type Length
+    = Length Int
 
 
-type alias Width =
-    Int
+type Width
+    = Width Int
 
 
-type alias Height =
-    Int
+type Height
+    = Height Int
 
 
 type alias Dimension =
@@ -23,7 +23,10 @@ type alias Dimension =
 
 
 
--- RUN
+{- run
+
+   Takes a raw string of input dimensions and returns a total need as an integer.
+-}
 
 
 run : String -> Int
@@ -55,7 +58,7 @@ extractDimensions : List Int -> Maybe Dimension
 extractDimensions list =
     case list of
         [ length, width, height ] ->
-            Just ( length, width, height )
+            Just ( Length length, Width width, Height height )
 
         _ ->
             Nothing
@@ -67,7 +70,7 @@ calculateSideAreas =
 
 
 calculateSideArea : Dimension -> ( Int, Int, Int )
-calculateSideArea ( length, width, height ) =
+calculateSideArea ( Length length, Width width, Height height ) =
     ( length * width
     , width * height
     , height * length
