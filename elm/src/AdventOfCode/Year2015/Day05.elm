@@ -1,9 +1,14 @@
 module AdventOfCode.Year2015.Day05 exposing
-    ( rawInput
+    ( containsRepeatedCharacter
+    , containsThreeVowels
+    , containsUnwantedStrings
+    , rawInput
     , run
     )
 
-import Html.Attributes exposing (list)
+-- IMPORTS
+
+import Utils.List
 
 
 
@@ -13,7 +18,7 @@ import Html.Attributes exposing (list)
 run : String -> Int
 run =
     processInput
-        >> filter
+        >> filters
         >> List.length
 
 
@@ -22,36 +27,34 @@ run =
 
 
 processInput : String -> List String
-processInput =
-    String.trim
-        >> String.lines
+processInput input =
+    input
+        |> String.trim
+        |> String.lines
+        |> List.map String.trim
 
 
 
 -- FILTERS
 
 
-filter : List String -> List String
-filter strings =
+filters : List String -> List String
+filters strings =
     strings
-        |> List.filter (not << containsSpecifiedStrings)
+        |> Utils.List.reject containsUnwantedStrings
         |> List.filter containsThreeVowels
-        |> List.filter containsLetterTwiceInARow
+        |> List.filter containsRepeatedCharacter
 
 
 
 {-
-   Does NOT contain the strings ab, cd, pq, or xy.
+   Contains any of the strings ab, cd, pq, or xy.
 -}
 
 
-containsSpecifiedStrings : String -> Bool
-containsSpecifiedStrings string =
-    let
-        specifiedStrings =
-            [ "ab", "cd", "pq", "xy" ]
-    in
-    False
+containsUnwantedStrings : String -> Bool
+containsUnwantedStrings string =
+    List.any (\s -> String.contains s string) [ "ab", "cd", "pq", "xy" ]
 
 
 
@@ -62,12 +65,72 @@ containsSpecifiedStrings string =
 
 containsThreeVowels : String -> Bool
 containsThreeVowels string =
-    -- TODO: Count vowels in string and determine if 3 or greater are present.
+    string
+        |> countVowelsInString
+        |> reduceVowelCountToBool
+
+
+type alias VowelCounts =
+    { a : Int
+    , e : Int
+    , i : Int
+    , o : Int
+    , u : Int
+    }
+
+
+countVowelsInString : String -> VowelCounts
+countVowelsInString string =
     let
-        vowels =
-            [ "a", "e", "i", "o", "u" ]
+        vowelCounts : VowelCounts
+        vowelCounts =
+            { a = 0
+            , e = 0
+            , i = 0
+            , o = 0
+            , u = 0
+            }
     in
-    True
+    string
+        |> String.split ""
+        |> List.foldl updateVowelCounts vowelCounts
+
+
+updateVowelCounts : String -> VowelCounts -> VowelCounts
+updateVowelCounts character vowelCounts =
+    case character of
+        "a" ->
+            { vowelCounts | a = vowelCounts.a + 1 }
+
+        "e" ->
+            { vowelCounts | e = vowelCounts.e + 1 }
+
+        "i" ->
+            { vowelCounts | i = vowelCounts.i + 1 }
+
+        "o" ->
+            { vowelCounts | o = vowelCounts.o + 1 }
+
+        "u" ->
+            { vowelCounts | u = vowelCounts.u + 1 }
+
+        _ ->
+            vowelCounts
+
+
+reduceVowelCountToBool : VowelCounts -> Bool
+reduceVowelCountToBool vowelCounts =
+    let
+        vowelsUsed =
+            [ vowelCounts.a
+            , vowelCounts.e
+            , vowelCounts.i
+            , vowelCounts.o
+            , vowelCounts.u
+            ]
+                |> List.sum
+    in
+    vowelsUsed >= 3
 
 
 
@@ -76,9 +139,16 @@ containsThreeVowels string =
 -}
 
 
-containsLetterTwiceInARow : String -> Bool
-containsLetterTwiceInARow string =
-    True
+containsRepeatedCharacter : String -> Bool
+containsRepeatedCharacter string =
+    let
+        repeatedCharactersToCheck : List String
+        repeatedCharactersToCheck =
+            string
+                |> String.split ""
+                |> List.map (\character -> String.repeat 2 character)
+    in
+    List.any (\repeatedCharacters -> String.contains repeatedCharacters string) repeatedCharactersToCheck
 
 
 
