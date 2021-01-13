@@ -22,6 +22,13 @@ run =
         >> List.length
 
 
+runPartTwo : String -> Int
+runPartTwo =
+    processInput
+        >> filtersForPartTwo
+        >> List.length
+
+
 
 -- PROCESS INPUT
 
@@ -44,6 +51,40 @@ filters strings =
         |> Utils.List.reject containsUnwantedStrings
         |> List.filter containsThreeVowels
         |> List.filter containsRepeatedCharacter
+
+
+filtersForPartTwo : List String -> List String
+filtersForPartTwo strings =
+    strings
+        |> List.filter containsPairOfLettersAppearingTwice
+        |> List.filter containsLetterWhichRepeatsWithLetterBetween
+
+
+
+{-
+   Contains a pair of any two letters that appears at least twice in the string
+   without overlapping, like xyxy (xy) or aabcdefgaa (aa), but not like aaa (aa,
+   but it overlaps).
+-}
+
+
+containsPairOfLettersAppearingTwice : String -> Bool
+containsPairOfLettersAppearingTwice string =
+    -- TODO
+    True
+
+
+
+{-
+   Contains at least one letter which repeats with exactly one letter between
+   them, like xyx, abcdefeghi (efe), or even aaa.
+-}
+
+
+containsLetterWhichRepeatsWithLetterBetween : String -> Bool
+containsLetterWhichRepeatsWithLetterBetween string =
+    -- TODO
+    True
 
 
 
