@@ -7,14 +7,25 @@ Project for data structure and algorithm practice.
 - Interview Challenges
   - [Cracking the Coding Interview](https://www.amazon.com/Cracking-Coding-Interview-Programming-Questions/dp/0984782850)
 
-## Elm
+## Scripts
 
-Available scripts for starting a local server as well as formatting and testing
-code:
+Here are example commands for running things like formatting, a local server,
+and the test suites:
+
+## Elm
 
 ```sh
 $ npm run format
 $ npm run start
 $ npm run test
 $ npm run watch
+```
+
+## Elixir
+
+```sh
+$ mix format
+$ iex -S mix
+$ mix test
+$ mix test.watch
 ```
