@@ -5,7 +5,7 @@ defmodule AdventOfCode.Year2015.Day04Test do
   alias AdventOfCode.Year2015.Day04
 
   test "generates a list of tuples containing hash strings and indices" do
-    [result | _tail] = Day04.run(Day04.brute_force_attempts())
+    [result | _tail] = Day04.run(1..1_000, 1)
     {hash, index} = result
 
     assert is_binary(hash)
@@ -13,7 +13,7 @@ defmodule AdventOfCode.Year2015.Day04Test do
   end
 
   test "generates correct solution for five zeros" do
-    [{_hash, index} | _tail] = Day04.run(1_000_000)
+    [{_hash, index} | _tail] = Day04.run(1..1_000_000, 5)
     assert index == 282_749
   end
 end

@@ -1,17 +1,22 @@
 defmodule AdventOfCode.Year2015.Day04 do
-  @spec brute_force_attempts() :: pos_integer()
-  def brute_force_attempts() do
-    1_000_000
-  end
-
   @type hash :: String.t()
+  @type index :: pos_integer()
 
-  @spec run(attempts_to_run :: pos_integer()) :: [{hash(), Enum.index()}]
-  def run(attempts_to_run) do
-    Range.new(1, attempts_to_run)
+  @doc """
+  Takes a range of attempts to run (`1..1_000`) and a number of zeros to check
+  for (`5`), and then generates a list of tuples containing MD5 hashes and
+  their related index in the following format:
+
+  `{"000002c655df7738246e88f6c1c43eb7", 282749}`
+  """
+  @spec run(range_of_attempts_to_run :: Range.t(), number_of_zeros_to_check :: pos_integer()) :: [
+          {hash(), index()}
+        ]
+  def run(range_of_attempts_to_run, number_of_zeros_to_check) do
+    range_of_attempts_to_run
     |> Enum.map(&generate_attempt/1)
     |> Enum.with_index(1)
-    |> Enum.filter(&starts_with_five_zeros?/1)
+    |> Enum.filter(&starts_with_n_zeros?(&1, number_of_zeros_to_check))
   end
 
   @doc """
@@ -29,13 +34,20 @@ defmodule AdventOfCode.Year2015.Day04 do
   def generate_attempt(attempt_number) do
     string = raw_input() <> Integer.to_string(attempt_number)
 
-    :crypto.hash(:md5, string)
+    :md5
+    |> :crypto.hash(string)
     |> Base.encode16(case: :lower)
   end
 
-  @spec starts_with_five_zeros?({hash :: hash, index :: pos_integer()}) :: boolean()
-  def starts_with_five_zeros?({hash, _index}) do
-    String.starts_with?(hash, "00000")
+  @spec starts_with_n_zeros?(
+          {hash :: hash(), index :: index()},
+          number_of_zeros :: pos_integer()
+        ) :: boolean()
+  def starts_with_n_zeros?(
+        {hash, _index},
+        number_of_zeros
+      ) do
+    String.starts_with?(hash, String.duplicate("0", number_of_zeros))
   end
 
   @spec raw_input() :: String.t()
