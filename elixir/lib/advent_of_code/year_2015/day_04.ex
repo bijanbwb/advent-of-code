@@ -1,12 +1,17 @@
 defmodule AdventOfCode.Year2015.Day04 do
-  @brute_force_attempts 1_000_000
+  @spec brute_force_attempts() :: pos_integer()
+  def brute_force_attempts() do
+    1_000_000
+  end
 
-  @spec run() :: [{Enum.element(), Enum.index()}]
-  def run() do
-    Range.new(1, @brute_force_attempts)
+  @type hash :: String.t()
+
+  @spec run(attempts_to_run :: pos_integer()) :: [{hash(), Enum.index()}]
+  def run(attempts_to_run) do
+    Range.new(1, attempts_to_run)
     |> Enum.map(&generate_attempt/1)
     |> Enum.with_index(1)
-    |> Enum.filter(fn {hash, _index} -> starts_with_five_zeros?(hash) end)
+    |> Enum.filter(&starts_with_five_zeros?/1)
   end
 
   @doc """
@@ -20,7 +25,7 @@ defmodule AdventOfCode.Year2015.Day04 do
       iex> AdventOfCode.Year2015.Day04.generate_attempt(1_000)
       "ab49b72532b5308d1e80d8c3c3b574a8"
   """
-  @spec generate_attempt(attempt_number :: pos_integer()) :: String.t()
+  @spec generate_attempt(attempt_number :: pos_integer()) :: hash()
   def generate_attempt(attempt_number) do
     string = raw_input() <> Integer.to_string(attempt_number)
 
@@ -28,9 +33,9 @@ defmodule AdventOfCode.Year2015.Day04 do
     |> Base.encode16(case: :lower)
   end
 
-  @spec starts_with_five_zeros?(string :: String.t()) :: boolean()
-  def starts_with_five_zeros?(string) do
-    String.starts_with?(string, "00000")
+  @spec starts_with_five_zeros?({hash :: hash, index :: pos_integer()}) :: boolean()
+  def starts_with_five_zeros?({hash, _index}) do
+    String.starts_with?(hash, "00000")
   end
 
   @spec raw_input() :: String.t()
