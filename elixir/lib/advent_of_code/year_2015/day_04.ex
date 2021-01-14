@@ -10,12 +10,15 @@ defmodule AdventOfCode.Year2015.Day04 do
   end
 
   @doc """
-  Each attempt is the input and a stringified integer.
+  Generates an MD5 hash using the input string and an attempt number.
+
+  The `attempt_number` is used to generate a string like `"yzbqklnj1000"`,
+  which we use to create the MD5 hash: `"ab49b72532b5308d1e80d8c3c3b574a8"`
 
   ## Example
 
-      iex> generate_attempt(1)
-      "yzbqklnj1"
+      iex> AdventOfCode.Year2015.Day04.generate_attempt(1_000)
+      "ab49b72532b5308d1e80d8c3c3b574a8"
   """
   @spec generate_attempt(attempt_number :: pos_integer()) :: String.t()
   def generate_attempt(attempt_number) do
