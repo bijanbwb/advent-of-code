@@ -1,22 +1,24 @@
 defmodule AdventOfCode.Year2015.Day04 do
+  @moduledoc false
+
   @type hash :: String.t()
   @type index :: pos_integer()
 
   @doc """
-  Takes a range of attempts to run (`1..1_000`) and a number of zeros to check
+  Takes a number of attempts to run (`1_000`) and a number of zeros to check
   for (`5`), and then generates a list of tuples containing MD5 hashes and
   their related index in the following format:
 
-  `{"000002c655df7738246e88f6c1c43eb7", 282749}`
+      {"000002c655df7738246e88f6c1c43eb7", 282749}
   """
-  @spec run(range_of_attempts_to_run :: Range.t(), number_of_zeros_to_check :: pos_integer()) :: [
+  @spec run(attempts_to_run :: pos_integer(), zeros_to_check_for :: pos_integer()) :: [
           {hash(), index()}
         ]
-  def run(range_of_attempts_to_run, number_of_zeros_to_check) do
-    range_of_attempts_to_run
+  def run(attempts_to_run, zeros_to_check_for) do
+    1..attempts_to_run
     |> Enum.map(&generate_attempt/1)
     |> Enum.with_index(1)
-    |> Enum.filter(&starts_with_n_zeros?(&1, number_of_zeros_to_check))
+    |> Enum.filter(&starts_with_n_zeros?(&1, zeros_to_check_for))
   end
 
   @doc """
