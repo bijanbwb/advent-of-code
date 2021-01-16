@@ -1,4 +1,7 @@
-module AdventOfCode.Year2015.Day06 exposing (..)
+module AdventOfCode.Year2015.Day06 exposing
+    ( rawInput
+    , run
+    )
 
 {-
 
@@ -22,6 +25,7 @@ module AdventOfCode.Year2015.Day06 exposing (..)
 -- IMPORTS
 
 import Dict exposing (Dict)
+import Parser exposing ((|.), (|=), DeadEnd, Parser)
 
 
 
@@ -60,12 +64,6 @@ toggleLight lightLocation grid =
     Dict.update lightLocation (Maybe.map toggleLightState) grid
 
 
-type Instruction
-    = Toggle
-    | TurnOff
-    | TurnOn
-
-
 toggleLightState : LightState -> LightState
 toggleLightState lightState =
     case lightState of
@@ -95,38 +93,93 @@ turnLightOff lightLocation grid =
 -}
 
 
-run : String -> List String
-run string =
-    string
-        |> processInput
+run : String -> List (Result (List DeadEnd) Instruction)
+run =
+    processInput
+        >> processInstructions initialGrid
 
 
 
--- |> processInstructions initialGrid
--- |> countNumberOfLightsOn
-
-
-countNumberOfLightsOn : Grid -> Int
-countNumberOfLightsOn grid =
-    grid
-        |> Dict.values
-        |> List.filter ((==) On)
-        |> List.length
-
-
-
+-- countNumberOfLightsOn : Grid -> Int
+-- countNumberOfLightsOn grid =
+--     grid
+--         |> Dict.values
+--         |> List.filter ((==) On)
+--         |> List.length
 -- PROCESS INPUT
 
 
 processInput : String -> List String
-processInput string =
-    string
-        |> String.lines
-        |> List.map String.trim
+processInput =
+    String.lines
+        >> List.map String.trim
 
 
 
 -- PROCESS INSTRUCTIONS
+
+
+processInstructions : Grid -> List String -> List (Result (List DeadEnd) Instruction)
+processInstructions _ =
+    List.map parseInstruction
+
+
+
+-- PARSING
+
+
+type alias Instruction =
+    { action : Action
+    , pair1 : Pair
+    , pair2 : Pair
+    }
+
+
+type Action
+    = Toggle
+    | TurnOff
+    | TurnOn
+
+
+type Pair
+    = Pair Int Int
+
+
+parseInstruction : String -> Result (List DeadEnd) Instruction
+parseInstruction =
+    Parser.run instruction
+
+
+instruction : Parser Instruction
+instruction =
+    Parser.succeed Instruction
+        |= actionParser
+        |. Parser.spaces
+        |= pairParser
+        |. Parser.spaces
+        |. Parser.keyword "through"
+        |. Parser.spaces
+        |= pairParser
+
+
+actionParser : Parser Action
+actionParser =
+    Parser.oneOf
+        [ Parser.map (\_ -> Toggle) (Parser.keyword "toggle")
+        , Parser.map (\_ -> TurnOff) (Parser.keyword "turn off")
+        , Parser.map (\_ -> TurnOn) (Parser.keyword "turn on")
+        ]
+
+
+pairParser : Parser Pair
+pairParser =
+    Parser.succeed Pair
+        |= Parser.int
+        |. Parser.symbol ","
+        |= Parser.int
+
+
+
 -- INPUT
 
 
