@@ -1,5 +1,7 @@
 module AdventOfCode.Year2015.Day06 exposing
-    ( rawInput
+    ( Action(..)
+    , Pair(..)
+    , rawInput
     , run
     )
 
@@ -53,10 +55,27 @@ type LightState
     | On
 
 
+
+{- initialGrid
+
+   Creates a 1000x1000 grid. Each location in the grid is a tuple starting with
+   (0,0) and ending at (999,999).
+-}
+
+
 initialGrid : Grid
 initialGrid =
-    Dict.empty
-        |> Dict.insert ( 0, 0 ) Off
+    List.foldr buildRow Dict.empty (List.range 0 999)
+
+
+buildRow : Int -> Grid -> Grid
+buildRow rowNumber grid =
+    List.foldr (insertLocation rowNumber) grid (List.range 0 999)
+
+
+insertLocation : Int -> Int -> (Grid -> Grid)
+insertLocation rowNumber columnNumber =
+    Dict.insert ( rowNumber, columnNumber ) Off
 
 
 toggleLight : LightLocation -> Grid -> Grid
@@ -76,12 +95,12 @@ toggleLightState lightState =
 
 turnLightOn : LightLocation -> Grid -> Grid
 turnLightOn lightLocation grid =
-    Dict.update lightLocation (\state -> Just On) grid
+    Dict.update lightLocation (\_ -> Just On) grid
 
 
 turnLightOff : LightLocation -> Grid -> Grid
 turnLightOff lightLocation grid =
-    Dict.update lightLocation (\state -> Just Off) grid
+    Dict.update lightLocation (\_ -> Just Off) grid
 
 
 
