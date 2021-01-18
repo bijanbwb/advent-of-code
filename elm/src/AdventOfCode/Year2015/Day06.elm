@@ -1,28 +1,26 @@
 module AdventOfCode.Year2015.Day06 exposing
-    ( Action(..)
-    , Pair(..)
-    , rawInput
+    ( rawInput
     , run
     )
 
 {-
 
-   - one million lights in a 1000x1000 grid
-     - Lights in your grid are numbered from 0 to 999 in each direction
-   - instructions on how to display the ideal lighting configuration
-     - turn on
-     - turn off
-     - toggle inclusive range
-       - given as coordinate pair (a, b) (c, d)
-       - Each coordinate pair represents opposite corners of a rectangle
+   Create a 1000x1000 grid of lights. Each light can be found by it's location,
+   with the first light (at the "top-left") located at `(0, 0)` and the last
+   light (at the "bottom-right") located at `(999, 999)`. All lights start in
+   an off state.
 
-   For example:
+   Takes in a list of instructions to turn lights off and on. For example:
 
-       turn on 0,0 through 999,999 would turn on (or leave on) every light.
-       toggle 0,0 through 999,0 would toggle the first line of 1000 lights, turning off the ones that were on, and turning on the ones that were off.
-       turn off 499,499 through 500,500 would turn off (or leave off) the middle four lights.
+   `"turn on 0,0 through 1,1"`
 
-   After following the instructions, how many lights are lit?
+   This instruction will turn on a group of four lights from `(0, 0)` to
+   `(1, 1)`. Each coordinate pair represents opposite corners of a rectangle,
+   and will be inclusive.
+
+   After running all instructions in the input, the return value will be an
+   integer of how many lights are in an on state.
+
 -}
 -- IMPORTS
 
@@ -39,15 +37,7 @@ type alias Grid =
 
 
 type alias LightLocation =
-    ( X, Y )
-
-
-type alias X =
-    Int
-
-
-type alias Y =
-    Int
+    ( Int, Int )
 
 
 type LightState
@@ -78,31 +68,6 @@ insertLocation rowNumber columnNumber =
     Dict.insert ( rowNumber, columnNumber ) Off
 
 
-toggleLight : LightLocation -> Grid -> Grid
-toggleLight lightLocation grid =
-    Dict.update lightLocation (Maybe.map toggleLightState) grid
-
-
-toggleLightState : LightState -> LightState
-toggleLightState lightState =
-    case lightState of
-        On ->
-            Off
-
-        Off ->
-            On
-
-
-turnLightOn : LightLocation -> Grid -> Grid
-turnLightOn lightLocation grid =
-    Dict.update lightLocation (\_ -> Just On) grid
-
-
-turnLightOff : LightLocation -> Grid -> Grid
-turnLightOff lightLocation grid =
-    Dict.update lightLocation (\_ -> Just Off) grid
-
-
 
 {- RUN
 
@@ -112,19 +77,26 @@ turnLightOff lightLocation grid =
 -}
 
 
-run : String -> List (Result (List DeadEnd) Instruction)
+run : String -> Int
 run =
     processInput
-        >> processInstructions initialGrid
+        >> processInstructions
+        >> applyInstructionsToGrid initialGrid
+        >> countNumberOfLightsOn
+
+
+countNumberOfLightsOn : Grid -> Int
+countNumberOfLightsOn =
+    Dict.filter lightIsOn
+        >> Dict.size
+
+
+lightIsOn : LightLocation -> LightState -> Bool
+lightIsOn _ lightState =
+    (==) lightState On
 
 
 
--- countNumberOfLightsOn : Grid -> Int
--- countNumberOfLightsOn grid =
---     grid
---         |> Dict.values
---         |> List.filter ((==) On)
---         |> List.length
 -- PROCESS INPUT
 
 
@@ -138,8 +110,8 @@ processInput =
 -- PROCESS INSTRUCTIONS
 
 
-processInstructions : Grid -> List String -> List (Result (List DeadEnd) Instruction)
-processInstructions _ =
+processInstructions : List String -> List (Result (List DeadEnd) Instruction)
+processInstructions =
     List.map parseInstruction
 
 
@@ -149,8 +121,8 @@ processInstructions _ =
 
 type alias Instruction =
     { action : Action
-    , pair1 : Pair
-    , pair2 : Pair
+    , lightLocation1 : LightLocation
+    , lightLocation2 : LightLocation
     }
 
 
@@ -160,25 +132,21 @@ type Action
     | TurnOn
 
 
-type Pair
-    = Pair Int Int
-
-
 parseInstruction : String -> Result (List DeadEnd) Instruction
 parseInstruction =
-    Parser.run instruction
+    Parser.run instructionParser
 
 
-instruction : Parser Instruction
-instruction =
+instructionParser : Parser Instruction
+instructionParser =
     Parser.succeed Instruction
         |= actionParser
         |. Parser.spaces
-        |= pairParser
+        |= lightLocationParser
         |. Parser.spaces
         |. Parser.keyword "through"
         |. Parser.spaces
-        |= pairParser
+        |= lightLocationParser
 
 
 actionParser : Parser Action
@@ -190,12 +158,87 @@ actionParser =
         ]
 
 
-pairParser : Parser Pair
-pairParser =
-    Parser.succeed Pair
+lightLocationParser : Parser LightLocation
+lightLocationParser =
+    Parser.succeed Tuple.pair
         |= Parser.int
         |. Parser.symbol ","
         |= Parser.int
+
+
+
+-- APPLY INSTRUCTIONS
+
+
+applyInstructionsToGrid : Grid -> List (Result (List DeadEnd) Instruction) -> Grid
+applyInstructionsToGrid =
+    List.foldl applyInstructionToGrid
+
+
+
+{-
+   TODO: Looks like this works for a single instruction but not multiple
+   instructions. I haven't looked into it yet, but I'm guessing the filter is
+   getting a subset and then never working with the full grid after that
+   subset is found.
+-}
+
+
+applyInstructionToGrid : Result (List DeadEnd) Instruction -> Grid -> Grid
+applyInstructionToGrid instruction grid =
+    case instruction of
+        Ok { action, lightLocation1, lightLocation2 } ->
+            case action of
+                TurnOn ->
+                    grid
+                        |> collectLightsToUpdate lightLocation1 lightLocation2
+                        |> Dict.map turnLightOn
+
+                TurnOff ->
+                    grid
+                        |> collectLightsToUpdate lightLocation1 lightLocation2
+                        |> Dict.map turnLightOff
+
+                Toggle ->
+                    grid
+                        |> collectLightsToUpdate lightLocation1 lightLocation2
+                        |> Dict.map toggleLight
+
+        Err error ->
+            let
+                _ =
+                    Debug.log "error" error
+            in
+            grid
+
+
+collectLightsToUpdate : LightLocation -> LightLocation -> Grid -> Grid
+collectLightsToUpdate ( a, b ) ( c, d ) =
+    Dict.filter (\( x, y ) _ -> a <= x && x <= c && b <= y && y <= d)
+
+
+
+-- ACTIONS
+
+
+toggleLight : LightLocation -> LightState -> LightState
+toggleLight _ lightState =
+    case lightState of
+        On ->
+            Off
+
+        Off ->
+            On
+
+
+turnLightOn : LightLocation -> LightState -> LightState
+turnLightOn _ _ =
+    On
+
+
+turnLightOff : LightLocation -> LightState -> LightState
+turnLightOff _ _ =
+    Off
 
 
 

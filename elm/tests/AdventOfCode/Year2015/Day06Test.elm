@@ -8,18 +8,24 @@ import Test exposing (Test)
 suite : Test
 suite =
     Test.describe "Day06"
-        [ shouldProcessInstruction "turn off 660,55 through 986,197"
+        [ shouldProcessInstruction "turn on 0,0 through 3,3"
+        , shouldProcessMultipleInstructions "turn on 0,0 through 1,1\nturn off 0,0 through 1,1\ntoggle 0,0 through 1,1"
         ]
 
 
 shouldProcessInstruction : String -> Test
 shouldProcessInstruction input =
-    Test.test "shouldProcessInstruction " <|
+    Test.test "shouldProcessInstruction" <|
         \_ ->
-            let
-                expectedInstruction =
-                    { action = TurnOff, pair1 = Pair 660 55, pair2 = Pair 986 197 }
-            in
             input
                 |> run
-                |> Expect.equal [ Ok expectedInstruction ]
+                |> Expect.equal 16
+
+
+shouldProcessMultipleInstructions : String -> Test
+shouldProcessMultipleInstructions input =
+    Test.test "shouldProcessMultipleInstructions" <|
+        \_ ->
+            input
+                |> run
+                |> Expect.equal 4
