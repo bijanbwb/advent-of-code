@@ -179,33 +179,9 @@ applyInstructionToGrid : Result (List DeadEnd) Instruction -> Grid -> Grid
 applyInstructionToGrid instruction grid =
     case instruction of
         Ok { action, lightLocation1, lightLocation2 } ->
-            case action of
-                TurnOn ->
-                    let
-                        updatedGrid =
-                            grid
-                                |> collectLightsToUpdate lightLocation1 lightLocation2
-                                |> Dict.map turnLightOn
-                    in
-                    Dict.union updatedGrid grid
-
-                TurnOff ->
-                    let
-                        updatedGrid =
-                            grid
-                                |> collectLightsToUpdate lightLocation1 lightLocation2
-                                |> Dict.map turnLightOff
-                    in
-                    Dict.union updatedGrid grid
-
-                Toggle ->
-                    let
-                        updatedGrid =
-                            grid
-                                |> collectLightsToUpdate lightLocation1 lightLocation2
-                                |> Dict.map toggleLight
-                    in
-                    Dict.union updatedGrid grid
+            grid
+                |> collectLightsToUpdate lightLocation1 lightLocation2
+                |> applyAction action grid
 
         Err error ->
             let
@@ -215,33 +191,52 @@ applyInstructionToGrid instruction grid =
             grid
 
 
-collectLightsToUpdate : LightLocation -> LightLocation -> Grid -> Grid
+collectLightsToUpdate : LightLocation -> LightLocation -> Grid -> List LightLocation
 collectLightsToUpdate ( a, b ) ( c, d ) =
-    Dict.filter (\( x, y ) _ -> a <= x && x <= c && b <= y && y <= d)
+    Dict.keys
+        >> List.filter (\( x, y ) -> a <= x && x <= c && b <= y && y <= d)
 
 
 
 -- ACTIONS
 
 
-toggleLight : LightLocation -> LightState -> LightState
-toggleLight _ lightState =
-    case lightState of
-        On ->
-            Off
+applyAction : Action -> Grid -> List LightLocation -> Grid
+applyAction action grid lightLocations =
+    case action of
+        Toggle ->
+            List.foldl toggleLight grid lightLocations
 
+        TurnOff ->
+            List.foldl turnLightOff grid lightLocations
+
+        TurnOn ->
+            List.foldl turnLightOn grid lightLocations
+
+
+toggleLight : LightLocation -> Grid -> Grid
+toggleLight lightLocation =
+    Dict.update lightLocation (Maybe.map toggleLightState)
+
+
+toggleLightState : LightState -> LightState
+toggleLightState lightState =
+    case lightState of
         Off ->
             On
 
-
-turnLightOn : LightLocation -> LightState -> LightState
-turnLightOn _ _ =
-    On
+        On ->
+            Off
 
 
-turnLightOff : LightLocation -> LightState -> LightState
-turnLightOff _ _ =
-    Off
+turnLightOn : LightLocation -> Grid -> Grid
+turnLightOn lightLocation =
+    Dict.update lightLocation (\_ -> Just On)
+
+
+turnLightOff : LightLocation -> Grid -> Grid
+turnLightOff lightLocation =
+    Dict.update lightLocation (\_ -> Just Off)
 
 
 
