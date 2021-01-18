@@ -102,8 +102,8 @@ lightIsOn _ lightState =
 
 processInput : String -> List String
 processInput =
-    String.lines
-        >> List.map String.trim
+    String.trim
+        >> String.lines
 
 
 
@@ -175,34 +175,37 @@ applyInstructionsToGrid =
     List.foldl applyInstructionToGrid
 
 
-
-{-
-   TODO: Looks like this works for a single instruction but not multiple
-   instructions. I haven't looked into it yet, but I'm guessing the filter is
-   getting a subset and then never working with the full grid after that
-   subset is found.
--}
-
-
 applyInstructionToGrid : Result (List DeadEnd) Instruction -> Grid -> Grid
 applyInstructionToGrid instruction grid =
     case instruction of
         Ok { action, lightLocation1, lightLocation2 } ->
             case action of
                 TurnOn ->
-                    grid
-                        |> collectLightsToUpdate lightLocation1 lightLocation2
-                        |> Dict.map turnLightOn
+                    let
+                        updatedGrid =
+                            grid
+                                |> collectLightsToUpdate lightLocation1 lightLocation2
+                                |> Dict.map turnLightOn
+                    in
+                    Dict.union updatedGrid grid
 
                 TurnOff ->
-                    grid
-                        |> collectLightsToUpdate lightLocation1 lightLocation2
-                        |> Dict.map turnLightOff
+                    let
+                        updatedGrid =
+                            grid
+                                |> collectLightsToUpdate lightLocation1 lightLocation2
+                                |> Dict.map turnLightOff
+                    in
+                    Dict.union updatedGrid grid
 
                 Toggle ->
-                    grid
-                        |> collectLightsToUpdate lightLocation1 lightLocation2
-                        |> Dict.map toggleLight
+                    let
+                        updatedGrid =
+                            grid
+                                |> collectLightsToUpdate lightLocation1 lightLocation2
+                                |> Dict.map toggleLight
+                    in
+                    Dict.union updatedGrid grid
 
         Err error ->
             let

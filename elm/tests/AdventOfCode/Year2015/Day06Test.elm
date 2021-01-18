@@ -10,6 +10,7 @@ suite =
     Test.describe "Day06"
         [ shouldProcessInstruction "turn on 0,0 through 3,3"
         , shouldProcessMultipleInstructions "turn on 0,0 through 1,1\nturn off 0,0 through 1,1\ntoggle 0,0 through 1,1"
+        , shouldProduceCorrectSolution rawInput
         ]
 
 
@@ -29,3 +30,12 @@ shouldProcessMultipleInstructions input =
             input
                 |> run
                 |> Expect.equal 4
+
+
+shouldProduceCorrectSolution : String -> Test
+shouldProduceCorrectSolution input =
+    Test.test "shouldProduceCorrectSolution" <|
+        \_ ->
+            input
+                |> run
+                |> Expect.equal 400410
