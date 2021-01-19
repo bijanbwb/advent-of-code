@@ -40,9 +40,19 @@ type alias LightLocation =
     ( Int, Int )
 
 
-type LightState
+type alias LightState =
+    { brightness : LightBrightness
+    , status : LightStatus
+    }
+
+
+type LightStatus
     = Off
     | On
+
+
+type alias LightBrightness =
+    Int
 
 
 
@@ -65,7 +75,8 @@ buildRow rowNumber grid =
 
 insertLocation : Int -> Int -> (Grid -> Grid)
 insertLocation rowNumber columnNumber =
-    Dict.insert ( rowNumber, columnNumber ) Off
+    Dict.insert ( rowNumber, columnNumber )
+        { brightness = 0, status = Off }
 
 
 
@@ -77,23 +88,33 @@ insertLocation rowNumber columnNumber =
 -}
 
 
-run : String -> Int
+run : String -> ( Int, Int )
 run =
     processInput
         >> processInstructions
         >> applyInstructionsToGrid initialGrid
-        >> countNumberOfLightsOn
+        >> calculateResults
 
 
-countNumberOfLightsOn : Grid -> Int
-countNumberOfLightsOn =
+calculateResults : Grid -> ( Int, Int )
+calculateResults grid =
+    ( calculateNumberOfLightsOn grid, calculateBrightnessSum grid )
+
+
+calculateNumberOfLightsOn : Grid -> Int
+calculateNumberOfLightsOn =
     Dict.filter lightIsOn
         >> Dict.size
 
 
 lightIsOn : LightLocation -> LightState -> Bool
-lightIsOn _ lightState =
-    (==) lightState On
+lightIsOn _ { status } =
+    (==) status On
+
+
+calculateBrightnessSum : Grid -> Int
+calculateBrightnessSum =
+    Dict.foldl (\_ { brightness } acc -> acc + brightness) 0
 
 
 
@@ -205,38 +226,67 @@ applyAction : Action -> Grid -> List LightLocation -> Grid
 applyAction action grid lightLocations =
     case action of
         Toggle ->
-            List.foldl toggleLight grid lightLocations
+            List.foldl toggle grid lightLocations
 
         TurnOff ->
-            List.foldl turnLightOff grid lightLocations
+            List.foldl decreaseBrightness grid lightLocations
 
         TurnOn ->
-            List.foldl turnLightOn grid lightLocations
+            List.foldl increaseBrightness grid lightLocations
 
 
-toggleLight : LightLocation -> Grid -> Grid
-toggleLight lightLocation =
-    Dict.update lightLocation (Maybe.map toggleLightState)
+toggle : LightLocation -> Grid -> Grid
+toggle lightLocation =
+    Dict.update lightLocation
+        (Maybe.map
+            (\lightState ->
+                { lightState
+                    | brightness = lightState.brightness + 2
+                    , status = toggleLightStatus lightState.status
+                }
+            )
+        )
 
 
-toggleLightState : LightState -> LightState
-toggleLightState lightState =
-    case lightState of
+increaseBrightness : LightLocation -> Grid -> Grid
+increaseBrightness lightLocation =
+    Dict.update lightLocation
+        (Maybe.map
+            (\lightState ->
+                { lightState
+                    | brightness = lightState.brightness + 1
+                    , status = On
+                }
+            )
+        )
+
+
+decreaseBrightness : LightLocation -> Grid -> Grid
+decreaseBrightness lightLocation =
+    Dict.update lightLocation
+        (Maybe.map
+            (\lightState ->
+                { lightState
+                    | brightness =
+                        if lightState.brightness > 0 then
+                            lightState.brightness - 1
+
+                        else
+                            lightState.brightness
+                    , status = Off
+                }
+            )
+        )
+
+
+toggleLightStatus : LightStatus -> LightStatus
+toggleLightStatus lightStatus =
+    case lightStatus of
         Off ->
             On
 
         On ->
             Off
-
-
-turnLightOn : LightLocation -> Grid -> Grid
-turnLightOn lightLocation =
-    Dict.update lightLocation (\_ -> Just On)
-
-
-turnLightOff : LightLocation -> Grid -> Grid
-turnLightOff lightLocation =
-    Dict.update lightLocation (\_ -> Just Off)
 
 
 

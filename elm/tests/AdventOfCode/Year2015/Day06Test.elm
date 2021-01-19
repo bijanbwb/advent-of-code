@@ -20,7 +20,7 @@ shouldProcessInstruction input =
         \_ ->
             input
                 |> run
-                |> Expect.equal 16
+                |> Expect.equal ( 16, 16 )
 
 
 shouldProcessMultipleInstructions : String -> Test
@@ -29,7 +29,7 @@ shouldProcessMultipleInstructions input =
         \_ ->
             input
                 |> run
-                |> Expect.equal 4
+                |> Expect.equal ( 4, 8 )
 
 
 shouldProduceCorrectSolution : String -> Test
@@ -38,4 +38,4 @@ shouldProduceCorrectSolution input =
         \_ ->
             input
                 |> run
-                |> Expect.equal 400410
+                |> Expect.equal ( 400410, 15343601 )
