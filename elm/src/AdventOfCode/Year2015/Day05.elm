@@ -5,6 +5,7 @@ module AdventOfCode.Year2015.Day05 exposing
     , containsUnwantedStrings
     , rawInput
     , run
+    , runPartTwo
     )
 
 -- IMPORTS
