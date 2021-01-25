@@ -1,5 +1,6 @@
 module AdventOfCode.Year2015.Day05 exposing
-    ( containsRepeatedCharacter
+    ( containsPairOfLettersAppearingTwice
+    , containsRepeatedCharacter
     , containsThreeVowels
     , containsUnwantedStrings
     , rawInput

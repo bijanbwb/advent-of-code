@@ -19,6 +19,9 @@ suite =
         , shouldWorkForGivenCounterExample "jchzalrnumimnmhp"
         , shouldWorkForGivenCounterExample "haegwjzuvuyypxyu"
         , shouldWorkForGivenCounterExample "dvszwmarrgswjxmb"
+        , shouldDetectStringsWithPairOfLettersAppearingTwice "xyxy"
+        , shouldDetectStringsWithPairOfLettersAppearingTwice "aabcdefgaa"
+        , shouldRejectStringsWithOverlappingLetters "aaa"
         ]
 
 
@@ -92,3 +95,21 @@ shouldWorkForGivenCounterExample input =
             input
                 |> run
                 |> Expect.equal 0
+
+
+shouldDetectStringsWithPairOfLettersAppearingTwice : String -> Test
+shouldDetectStringsWithPairOfLettersAppearingTwice input =
+    Test.test ("shouldDetectStringsWithPairOfLettersAppearingTwice" ++ input) <|
+        \_ ->
+            input
+                |> containsPairOfLettersAppearingTwice
+                |> Expect.equal True
+
+
+shouldRejectStringsWithOverlappingLetters : String -> Test
+shouldRejectStringsWithOverlappingLetters input =
+    Test.test ("shouldRejectStringsWithOverlappingLetters" ++ input) <|
+        \_ ->
+            input
+                |> containsPairOfLettersAppearingTwice
+                |> Expect.equal False
