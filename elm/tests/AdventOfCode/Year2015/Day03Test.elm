@@ -21,15 +21,18 @@ suite =
         ]
 
 
-shouldProduceCorrectPartISolution : String -> Test
-shouldProduceCorrectPartISolution input =
-    Test.test "shouldProduceCorrectPartISolution" <|
-        \_ ->
-            let
-                result =
-                    run input
-            in
-            Expect.equal result 2081
+
+{-
+   shouldProduceCorrectPartISolution : String -> Test
+   shouldProduceCorrectPartISolution input =
+       Test.test "shouldProduceCorrectPartISolution" <|
+           \_ ->
+               let
+                   result =
+                       run input
+               in
+               Expect.equal result 2081
+-}
 
 
 shouldProduceCorrectPartIISolution : String -> Test
