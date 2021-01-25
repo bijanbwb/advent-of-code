@@ -146,7 +146,7 @@ isEven ( int, _ ) =
 moveToNewLocation : Direction -> HousesVisited -> HousesVisited
 moveToNewLocation direction housesVisited =
     case housesVisited of
-        (House ( x, y )) :: rest ->
+        (House ( x, y )) :: _ ->
             case direction of
                 North ->
                     House ( x, y + 1 ) :: housesVisited

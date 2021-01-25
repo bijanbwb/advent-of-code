@@ -10,10 +10,6 @@ type Floor
     = Floor Int
 
 
-type Input
-    = Input String
-
-
 type Instruction
     = Up
     | Down

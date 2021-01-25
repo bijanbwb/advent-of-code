@@ -109,7 +109,7 @@ calculateNumberOfLightsOn =
 
 lightIsOn : LightLocation -> LightState -> Bool
 lightIsOn _ { status } =
-    (==) status On
+    status == On
 
 
 calculateBrightnessSum : Grid -> Int

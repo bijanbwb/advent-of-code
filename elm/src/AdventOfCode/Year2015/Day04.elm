@@ -55,9 +55,12 @@ generateAttempt =
         >> String.append rawInput
 
 
-startsWithFiveZeros : ( Int, String ) -> Bool
-startsWithFiveZeros ( _, result ) =
-    String.startsWith "00000" result
+
+{-
+   startsWithFiveZeros : ( Int, String ) -> Bool
+   startsWithFiveZeros ( _, result ) =
+       String.startsWith "00000" result
+-}
 
 
 startsWithSixZeros : ( Int, String ) -> Bool
@@ -74,10 +77,3 @@ addIndices =
 incrementIndex : ( Int, String ) -> ( Int, String )
 incrementIndex ( index, result ) =
     ( index + 1, result )
-
-
-
-{- NOTES
-
-   (1962625,"0000004b347bf4b398b3f62ace7cd301") Too low
--}

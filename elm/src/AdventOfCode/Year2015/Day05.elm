@@ -71,7 +71,7 @@ filtersForPartTwo strings =
 
 
 containsPairOfLettersAppearingTwice : String -> Bool
-containsPairOfLettersAppearingTwice string =
+containsPairOfLettersAppearingTwice _ =
     -- TODO
     True
 
@@ -84,7 +84,7 @@ containsPairOfLettersAppearingTwice string =
 
 
 containsLetterWhichRepeatsWithLetterBetween : String -> Bool
-containsLetterWhichRepeatsWithLetterBetween string =
+containsLetterWhichRepeatsWithLetterBetween _ =
     -- TODO
     True
 

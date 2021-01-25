@@ -106,7 +106,7 @@ multiplyTwoEntries : Maybe ( Entry, Entry ) -> Int
 multiplyTwoEntries maybeEntries =
     case maybeEntries of
         Just ( entry1, entry2 ) ->
-            (*) entry1 entry2
+            entry1 * entry2
 
         Nothing ->
             0

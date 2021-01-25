@@ -1,5 +1,6 @@
 module AdventOfCode.Year2015.Day07 exposing
-    ( rawInput
+    ( Operation(..)
+    , rawInput
     , run
     )
 
@@ -140,9 +141,15 @@ getSignal wireId =
 
 run : String -> Maybe Signal
 run input =
-    -- processInput
-    -- processInstructions
-    initialCircuit
+    input
+        |> processInput
+        |> processInstructions
+        |> buildCircuit initialCircuit
+
+
+buildCircuit : Circuit -> List Instruction -> Maybe Signal
+buildCircuit circuit _ =
+    circuit
         |> addWire "a" 1
         |> getSignal "a"
 
@@ -177,8 +184,8 @@ type Operation
 
 
 processInstructions : List String -> List Instruction
-processInstructions input =
-    List.map (\s -> Instruction And "a") input
+processInstructions =
+    List.map (\_ -> Instruction And "a")
 
 
 
