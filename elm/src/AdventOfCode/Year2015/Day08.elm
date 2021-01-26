@@ -1,57 +1,40 @@
 module AdventOfCode.Year2015.Day08 exposing
-    ( rawInput
+    ( countStringCharacters
+    , countTotalCharacters
+    , rawInput
     , run
     )
 
-{-
-   Santa's list digitized. How much space will it take up?
-
-   escape special characters in strings
-
-   diff between
-    - the number of characters in the code representation of the string literal
-    - the number of characters in the in-memory string itself
-
-   ## Examples
-
-       "" is 2 characters of code (the two double quotes), but the string contains zero characters.
-       "abc" is 5 characters of code, but 3 characters in the string data.
-       "aaa\"aaa" is 10 characters of code, but the string itself contains six "a" characters and a single, escaped quote character, for a total of 7 characters in the string data.
-       "\x27" is 6 characters of code, but the string itself contains just one - an apostrophe ('), escaped using hexadecimal notation.
-
-   ## Input
-
-   A file that contains many double-quoted string literals, one on each line.
-
-   The only escape sequences used are
-
-   - \\ (which represents a single backslash)
-   - \" (which represents a lone double-quote character)
-   - \x plus two hexadecimal characters (which represents a single character with that ASCII code)
-
-   ## Output
-
-   What is the number of characters of code for string literals minus the
-   number of characters in memory for the values of the strings in total for
-   the entire file?
-
-   For example, given the four strings above, the total number of characters of
-   string code (2 + 5 + 10 + 6 = 23) minus the total number of characters in
-   memory for string values (0 + 3 + 7 + 1 = 11) is 23 - 11 = 12.
-
--}
-{- RUN
-
-   Takes in a large string as input, each line is taken
-
--}
+-- MODEL
 
 
-run : String -> List String
-run input =
-    input
-        |> processInput
-        |> Debug.log "x"
+type alias Model =
+    { totalCharacters : Int
+    , stringCharacters : Int
+    }
+
+
+initialModel : Model
+initialModel =
+    { totalCharacters = 0
+    , stringCharacters = 0
+    }
+
+
+
+-- RUN
+
+
+run : String -> Int
+run =
+    processInput
+        >> processLines initialModel
+        >> getResult
+
+
+getResult : Model -> Int
+getResult model =
+    model.totalCharacters - model.stringCharacters
 
 
 
@@ -59,10 +42,66 @@ run input =
 
 
 processInput : String -> List String
-processInput input =
-    input
-        |> String.trim
-        |> String.lines
+processInput =
+    String.trim
+        >> String.lines
+
+
+
+-- PROCESS LINES
+
+
+processLines : Model -> List String -> Model
+processLines model =
+    List.foldl processLine model
+
+
+processLine : String -> Model -> Model
+processLine line model =
+    { model
+        | totalCharacters = countTotalCharacters line
+        , stringCharacters = countStringCharacters line
+    }
+
+
+
+-- COUNT
+
+
+countTotalCharacters : String -> Int
+countTotalCharacters string =
+    let
+        quotationMarks =
+            2
+
+        stringLength =
+            String.length string
+
+        escapeCharacters =
+            countEscapeCharacters string
+    in
+    stringLength + quotationMarks + escapeCharacters
+
+
+countEscapeCharacters : String -> Int
+countEscapeCharacters string =
+    let
+        backslashes =
+            string
+                |> String.indexes "\\"
+                |> List.length
+
+        doubleQuotes =
+            string
+                |> String.indexes "\""
+                |> List.length
+    in
+    backslashes + doubleQuotes
+
+
+countStringCharacters : String -> Int
+countStringCharacters =
+    String.length
 
 
 
