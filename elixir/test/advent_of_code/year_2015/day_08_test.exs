@@ -3,7 +3,7 @@ defmodule AdventOfCode.Year2015.Day08Test do
 
   alias AdventOfCode.Year2015.Day08
 
-  describe "unit tests for counting characters in lines" do
+  describe "line counts" do
     test "should count total characters for empty line" do
       line = ""
       result = Day08.count_total_characters(line)
@@ -40,18 +40,17 @@ defmodule AdventOfCode.Year2015.Day08Test do
       assert result == 8
     end
 
-    # TODO
-    # test "should count total characters for line with hex escape sequences" do
-    #   line = "\x27"
-    #   result = Day08.count_total_characters(line)
-    #   assert result == 6
-    # end
+    test "should count total characters for line with hex escape sequences" do
+      line = "\x27"
+      result = Day08.count_total_characters(line)
+      assert result == 6
+    end
 
-    # test "should count string characters for line with hex escape sequences" do
-    #   line = "\x27"
-    #   result = Day08.count_string_characters(line)
-    #   assert result == 1
-    # end
+    test "should count string characters for line with hex escape sequences" do
+      line = "\x27"
+      result = Day08.count_string_characters(line)
+      assert result == 1
+    end
   end
 
   describe "run" do
@@ -61,19 +60,28 @@ defmodule AdventOfCode.Year2015.Day08Test do
       assert result == 2
     end
 
-    # TODO
-    # Test given examples below
+    # test "returns correct result for simple input" do
+    #   input = """
+    #   "abc"
+    #   """
+
+    #   # 5 - 3 == 2
+    #   result = Day08.run(input)
+    #   assert result == 2
+    # end
+
+    # test "returns correct result for example lines given" do
+    #   input = """
+    #   "abc"
+    #   "aaa\"aaa"
+    #   "\x27"
+    #   """
+
+    #   # Total Characters: (5 + 10 + 6 = 23)
+    #   # String Characters: (3 + 7 + 1 = 11)
+    #   # Difference: (21 - 11 = 10)
+    #   result = Day08.run(input)
+    #   assert result == 10
+    # end
   end
 end
-
-# ### Handle Hex Escape Sequences
-
-# Handle hex escape sequences (\x plus two hex characters e.g. \x12)
-# "\x27" is 6 characters of code, but the string itself contains just one - an
-# apostrophe ('), escaped using hexadecimal notation.
-
-# ### Test calls to run
-
-# given the four strings above, the total number of characters of
-# string code (2 + 5 + 10 + 6 = 23) minus the total number of characters in
-# memory for string values (0 + 3 + 7 + 1 = 11) is 23 - 11 = 12.

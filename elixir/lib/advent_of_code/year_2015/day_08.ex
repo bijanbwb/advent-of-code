@@ -20,12 +20,12 @@ defmodule AdventOfCode.Year2015.Day08 do
   def run(input) do
     input
     |> process_input()
-    |> process_lines({0, 0})
+    |> process_lines()
     |> get_result()
   end
 
-  @spec get_result(counts()) :: result()
-  def get_result({total_character_count, string_character_count}) do
+  @spec get_result(counts :: counts()) :: result()
+  def get_result({total_character_count, string_character_count} = _counts) do
     total_character_count - string_character_count
   end
 
@@ -37,19 +37,21 @@ defmodule AdventOfCode.Year2015.Day08 do
     input
     |> String.trim()
     |> String.split("\n")
+    |> Enum.map(&String.trim/1)
   end
 
   #
   # PROCESS LINES
   #
 
-  @spec process_lines(lines :: list(line()), counts :: counts()) :: counts()
-  def process_lines(lines, counts) do
-    Enum.reduce(lines, counts, &process_line/2)
+  @spec process_lines(lines :: list(line())) :: counts()
+  def process_lines(lines) do
+    Enum.reduce(lines, {0, 0}, &process_line/2)
   end
 
-  @spec process_line(line :: line(), counts()) :: counts()
-  def process_line(line, {total_character_count, string_character_count}) do
+  @spec process_line(line :: line(), counts :: counts()) :: counts()
+  def process_line(line, {total_character_count, string_character_count} = _counts) do
+    IO.inspect(line)
     {
       total_character_count + count_total_characters(line),
       string_character_count + count_string_characters(line)
@@ -60,13 +62,26 @@ defmodule AdventOfCode.Year2015.Day08 do
   # COUNTS
   #
 
+  @doc """
+  ## Idea for Refactoring
+
+  This currently calls multiple functions, each of which split the line into
+  characters. It could be refactored to work by splitting the line and
+  iterating through the characters a single time. It could also use
+  `Enum.reduce/3` with a starting value of `2` instead of adding all the
+  values together at the bottom.
+  """
   @spec count_total_characters(line :: line()) :: total_character_count()
   def count_total_characters(line) do
-    quotation_marks = 2
-    string_length = String.length(line)
-    escape_characters = count_escape_characters(line)
+    double_quotes_length = 2
+    string_length = count_string_characters(line)
+    escape_characters_length = count_escape_characters(line)
+    # hex sequences are four characters like `\x12`, we already count one
+    # character using `string_length` above. So for each hex character found,
+    # we multiply by 3 to get a number to add to the total
+    hex_characters_length = count_hex_characters(line) * 3
 
-    string_length + quotation_marks + escape_characters
+    Enum.sum([double_quotes_length, string_length, escape_characters_length, hex_characters_length])
   end
 
   @spec count_escape_characters(line :: line()) :: non_neg_integer()
@@ -82,9 +97,25 @@ defmodule AdventOfCode.Year2015.Day08 do
       character == "\""
   end
 
+  @spec count_hex_characters(line :: line()) :: non_neg_integer()
+  def count_hex_characters(line) do
+    line
+    |> String.graphemes()
+    |> Enum.reject(&is_escape_character?/1)
+    |> Enum.count(&is_hex_character?/1)
+  end
+
+  @spec is_hex_character?(character :: String.grapheme()) :: boolean()
+  def is_hex_character?(<<value>>) do
+    value < 65 or 127 < value
+  end
+
   @spec count_string_characters(line()) :: string_character_count()
   def count_string_characters(line) do
-    String.length(line)
+    line
+    |> String.trim_leading("\"")
+    |> String.trim_trailing("\"")
+    |> String.length()
   end
 
   @spec raw_input() :: String.t()
