@@ -32,12 +32,13 @@ defmodule AdventOfCode.Year2015.Day08 do
   #
   # PROCESS INPUT
   #
+
   @spec process_input(input :: input()) :: list(line())
   def process_input(input) do
     input
     |> String.trim()
     |> String.split("\n")
-    |> Enum.map(&String.trim/1)
+    |> Enum.map(&String.trim(&1, "\""))
   end
 
   #
@@ -51,7 +52,6 @@ defmodule AdventOfCode.Year2015.Day08 do
 
   @spec process_line(line :: line(), counts :: counts()) :: counts()
   def process_line(line, {total_character_count, string_character_count} = _counts) do
-    IO.inspect(line)
     {
       total_character_count + count_total_characters(line),
       string_character_count + count_string_characters(line)
@@ -63,25 +63,24 @@ defmodule AdventOfCode.Year2015.Day08 do
   #
 
   @doc """
-  ## Idea for Refactoring
+  ## Refactoring Idea
 
   This currently calls multiple functions, each of which split the line into
-  characters. It could be refactored to work by splitting the line and
-  iterating through the characters a single time. It could also use
-  `Enum.reduce/3` with a starting value of `2` instead of adding all the
-  values together at the bottom.
+  characters. It could be refactored to work by splitting the line once and
+  iterating through the characters. It could also use `Enum.reduce/3` with a
+  starting value of `2` instead of adding all the values together at the bottom.
   """
   @spec count_total_characters(line :: line()) :: total_character_count()
   def count_total_characters(line) do
-    double_quotes_length = 2
-    string_length = count_string_characters(line)
-    escape_characters_length = count_escape_characters(line)
+    double_quotes = 2
+    string = count_string_characters(line)
+    escape_characters = count_escape_characters(line)
     # hex sequences are four characters like `\x12`, we already count one
-    # character using `string_length` above. So for each hex character found,
+    # character using `string` above. So for each hex character found,
     # we multiply by 3 to get a number to add to the total
-    hex_characters_length = count_hex_characters(line) * 3
+    hex_characters = count_hex_characters(line) * 3
 
-    Enum.sum([double_quotes_length, string_length, escape_characters_length, hex_characters_length])
+    Enum.sum([double_quotes, string, escape_characters, hex_characters])
   end
 
   @spec count_escape_characters(line :: line()) :: non_neg_integer()
@@ -112,10 +111,7 @@ defmodule AdventOfCode.Year2015.Day08 do
 
   @spec count_string_characters(line()) :: string_character_count()
   def count_string_characters(line) do
-    line
-    |> String.trim_leading("\"")
-    |> String.trim_trailing("\"")
-    |> String.length()
+    String.length(line)
   end
 
   @spec raw_input() :: String.t()

@@ -57,31 +57,30 @@ defmodule AdventOfCode.Year2015.Day08Test do
     test "returns correct result for empty input" do
       input = ""
       result = Day08.run(input)
+      # 2 - 0 == 2
       assert result == 2
     end
 
-    # test "returns correct result for simple input" do
-    #   input = """
-    #   "abc"
-    #   """
+    test "returns correct result for simple input" do
+      input = """
+      "abc"
+      """
 
-    #   # 5 - 3 == 2
-    #   result = Day08.run(input)
-    #   assert result == 2
-    # end
+      # 5 - 3 == 2
+      result = Day08.run(input)
+      assert result == 2
+    end
 
-    # test "returns correct result for example lines given" do
-    #   input = """
-    #   "abc"
-    #   "aaa\"aaa"
-    #   "\x27"
-    #   """
+    test "returns correct result for example lines given" do
+      input = """
+      "abc"
+      "aaa\"aaa"
+      "\x27"
+      """
 
-    #   # Total Characters: (5 + 10 + 6 = 23)
-    #   # String Characters: (3 + 7 + 1 = 11)
-    #   # Difference: (21 - 11 = 10)
-    #   result = Day08.run(input)
-    #   assert result == 10
-    # end
+      result = Day08.run(input)
+      # 21 - 11 == 10
+      assert result == 10
+    end
   end
 end
