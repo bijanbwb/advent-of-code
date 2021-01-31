@@ -82,5 +82,12 @@ defmodule AdventOfCode.Year2015.Day08Test do
       # 21 - 11 == 10
       assert result == 10
     end
+
+    test "returns correct result for full given input" do
+      input = Day08.raw_input()
+      result = Day08.run(input)
+      # assert result == 1246
+      # Note: 1246 is too low
+    end
   end
 end
