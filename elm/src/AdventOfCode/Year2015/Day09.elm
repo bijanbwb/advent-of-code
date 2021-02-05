@@ -32,16 +32,43 @@ module AdventOfCode.Year2015.Day09 exposing
      - can start and end at any two different locations.
      - must visit each location exactly once.
 -}
+-- IMPORTS
+
+import Parser exposing ((|.), (|=), DeadEnd, Parser)
+
+
+
 -- MODEL
--- type alias Location =
---     -- Node
---     String
--- type alias Distance =
---     -- Edge
---     Int
 
 
-type alias Model =
+type alias Input =
+    String
+
+
+type Line
+    = Line Location Location Distance
+
+
+
+{- Node -}
+
+
+type Location
+    = Tristram
+    | AlphaCentauri
+    | Snowdin
+    | Tambi
+    | Faerun
+    | Norrath
+    | Straylight
+    | Arbre
+
+
+
+{- Edge -}
+
+
+type alias Distance =
     Int
 
 
@@ -49,16 +76,84 @@ type alias Model =
 -- RUN
 
 
-run : String -> Model
-run _ =
-    0
+run : Input -> Distance
+run =
+    processInput
+        >> parseLines
+        >> handleParsedLines
+
+
+
+-- PROCESS INPUT
+
+
+processInput : Input -> List String
+processInput =
+    String.trim
+        >> String.lines
+
+
+
+-- PARSE LINES
+
+
+parseLines : List String -> List (Result (List DeadEnd) Line)
+parseLines =
+    List.map parseLine
+
+
+parseLine : String -> Result (List DeadEnd) Line
+parseLine =
+    Parser.run lineParser
+
+
+lineParser : Parser Line
+lineParser =
+    Parser.succeed Line
+        |= locationParser
+        |. Parser.spaces
+        |. Parser.keyword "to"
+        |. Parser.spaces
+        |= locationParser
+        |. Parser.spaces
+        |. Parser.symbol "="
+        |. Parser.spaces
+        |= Parser.int
+
+
+locationParser : Parser Location
+locationParser =
+    Parser.oneOf
+        [ Parser.map (\_ -> Tristram) (Parser.keyword "Tristram")
+        , Parser.map (\_ -> AlphaCentauri) (Parser.keyword "AlphaCentauri")
+        , Parser.map (\_ -> Snowdin) (Parser.keyword "Snowdin")
+        , Parser.map (\_ -> Tambi) (Parser.keyword "Tambi")
+        , Parser.map (\_ -> Faerun) (Parser.keyword "Faerun")
+        , Parser.map (\_ -> Norrath) (Parser.keyword "Norrath")
+        , Parser.map (\_ -> Straylight) (Parser.keyword "Straylight")
+        , Parser.map (\_ -> Arbre) (Parser.keyword "Arbre")
+        ]
+
+
+
+-- HANDLE LINES
+
+
+handleParsedLines : List (Result (List DeadEnd) Line) -> Int
+handleParsedLines parsedLines =
+    case parsedLines of
+        [] ->
+            0
+
+        _ :: _ ->
+            0
 
 
 
 -- INPUT
 
 
-rawInput : String
+rawInput : Input
 rawInput =
     """
 Tristram to AlphaCentauri = 34

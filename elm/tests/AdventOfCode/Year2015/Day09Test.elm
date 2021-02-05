@@ -8,12 +8,12 @@ import Test exposing (Test)
 suite : Test
 suite =
     Test.describe "Day09"
-        [ shouldWork "" ]
+        [ shouldParseLine "Tristram to AlphaCentauri = 34" ]
 
 
-shouldWork : String -> Test
-shouldWork input =
-    Test.test "shouldWork" <|
+shouldParseLine : String -> Test
+shouldParseLine input =
+    Test.test "shouldParseLine" <|
         \_ ->
             input
                 |> run
