@@ -4,11 +4,10 @@ module AdventOfCode.Year2015.Day09 exposing
     )
 
 {-
-   Every year, Santa manages to deliver all of his presents in a single night.
+   Santa is delivering presents to new locations. What is the shortest distance
+   he can travel to achieve this?
 
-   This year, however, he has some new locations to visit; his elves have provided him the distances between every pair of locations. He can start and end at any two (different) locations he wants, but he must visit each location exactly once. What is the shortest distance he can travel to achieve this?
-
-   For example, given the following distances:
+   ## Example
 
    London to Dublin = 464
    London to Belfast = 518
@@ -23,11 +22,23 @@ module AdventOfCode.Year2015.Day09 exposing
    Belfast -> Dublin -> London = 605
    Belfast -> London -> Dublin = 982
 
-   The shortest of these is London -> Dublin -> Belfast = 605, and so the answer is 605 in this example.
+   The shortest of these is London -> Dublin -> Belfast = 605, and so the
+   answer is 605 in this example.
 
-   What is the distance of the shortest route?
+   ## Steps
+
+   - Parse rawInput string into Nodes (Locations) and Edges (Distances).
+   - Find the shortest distance that visits each node in the graph.
+     - can start and end at any two different locations.
+     - must visit each location exactly once.
 -}
 -- MODEL
+-- type alias Location =
+--     -- Node
+--     String
+-- type alias Distance =
+--     -- Edge
+--     Int
 
 
 type alias Model =
