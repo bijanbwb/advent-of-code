@@ -34,6 +34,7 @@ module AdventOfCode.Year2015.Day09 exposing
 -}
 -- IMPORTS
 
+import Graph exposing (Edge, Graph, Node)
 import Parser exposing ((|.), (|=), DeadEnd, Parser)
 
 
@@ -70,6 +71,42 @@ type Location
 
 type alias Distance =
     Int
+
+
+
+-- GRAPH
+
+
+graph : Graph Location Distance
+graph =
+    let
+        nodes =
+            [ Node 0 Tristram
+            , Node 1 AlphaCentauri
+            , Node 2 Snowdin
+            , Node 3 Tambi
+            , Node 4 Faerun
+            , Node 5 Norrath
+            , Node 6 Straylight
+            , Node 7 Arbre
+            ]
+
+        edge from to distance =
+            Edge from to distance
+
+        edges =
+            [ edge 0 3 1
+            , edge 1 2 1
+            , edge 1 3 1
+            , edge 2 3 1
+            , edge 2 6 1
+            , edge 5 6 1
+            , edge 5 7 1
+            , edge 6 8 1
+            , edge 7 8 1
+            ]
+    in
+    Graph.fromNodesAndEdges nodes edges
 
 
 
