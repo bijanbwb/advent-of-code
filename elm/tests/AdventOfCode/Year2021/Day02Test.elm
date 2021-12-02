@@ -1,13 +1,13 @@
-module AdventOfCode.Year2021.Day01Test exposing (suite)
+module AdventOfCode.Year2021.Day02Test exposing (suite)
 
-import AdventOfCode.Year2021.Day01 exposing (..)
+import AdventOfCode.Year2021.Day02 exposing (..)
 import Expect
 import Test exposing (Test)
 
 
 suite : Test
 suite =
-    Test.describe "Day01"
+    Test.describe "Day02"
         [ shouldProduceCorrectSolution rawInput
         ]
 
@@ -18,4 +18,4 @@ shouldProduceCorrectSolution input =
         \_ ->
             input
                 |> run
-                |> Expect.equal 1103
+                |> Expect.equal 1408487760
